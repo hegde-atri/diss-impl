@@ -8,14 +8,17 @@ import {
 	Command,
 	Frame,
 	GalleryVerticalEnd,
+	Joystick,
+	Link,
 	Map,
+	Network,
 	PieChart,
 	Settings2,
 	SquareTerminal,
 } from "lucide-react";
 
-import { NavMain } from "@/components/nav-main";
 import { NavResources } from "@/components/nav-resources";
+import { NavTools } from "@/components/nav-tools";
 import { NavUser } from "@/components/nav-user";
 import {
 	Sidebar,
@@ -27,47 +30,19 @@ import {
 
 // This is sample data.
 const data = {
-	user: {
-		name: "shadcn",
-		email: "m@example.com",
-		avatar: "/avatars/shadcn.jpg",
-	},
 	navMain: [
 		{
-			title: "Playground",
-			url: "#",
-			icon: SquareTerminal,
+			title: "Tutorials",
+			url: "/dashboard/tele",
+			icon: Map,
 			isActive: true,
 			items: [
 				{
-					title: "History",
+					title: "Topics",
 					url: "#",
 				},
 				{
-					title: "Starred",
-					url: "#",
-				},
-				{
-					title: "Settings",
-					url: "#",
-				},
-			],
-		},
-		{
-			title: "Models",
-			url: "#",
-			icon: Bot,
-			items: [
-				{
-					title: "Genesis",
-					url: "#",
-				},
-				{
-					title: "Explorer",
-					url: "#",
-				},
-				{
-					title: "Quantum",
+					title: "Teleoperation",
 					url: "#",
 				},
 			],
@@ -82,38 +57,11 @@ const data = {
 					url: "#",
 				},
 				{
-					title: "Get Started",
+					title: "Pairing",
 					url: "#",
 				},
 				{
-					title: "Tutorials",
-					url: "#",
-				},
-				{
-					title: "Changelog",
-					url: "#",
-				},
-			],
-		},
-		{
-			title: "Settings",
-			url: "#",
-			icon: Settings2,
-			items: [
-				{
-					title: "General",
-					url: "#",
-				},
-				{
-					title: "Team",
-					url: "#",
-				},
-				{
-					title: "Billing",
-					url: "#",
-				},
-				{
-					title: "Limits",
+					title: "Teleoperation",
 					url: "#",
 				},
 			],
@@ -121,35 +69,43 @@ const data = {
 	],
 	projects: [
 		{
-			name: "Design Engineering",
-			url: "#",
-			icon: Frame,
+			name: "Pairing",
+			url: "/dashboard/pairing",
+			icon: Link,
 		},
 		{
-			name: "Sales & Marketing",
-			url: "#",
-			icon: PieChart,
+			name: "Teleoperation",
+			url: "/dashboard/tele",
+			icon: Joystick,
 		},
 		{
-			name: "Travel",
-			url: "#",
-			icon: Map,
+			name: "Topic Visualisation",
+			url: "/dashboard/topic",
+			icon: Network,
+		},
+		{
+			name: "Terminal",
+			url: "/dashboard/terminal",
+			icon: SquareTerminal,
 		},
 	],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+	const waffle = {
+		number: 2,
+	};
 	return (
 		<Sidebar collapsible="icon" {...props}>
 			<SidebarHeader>
 				<h1>TB3 Dashboard</h1>
 			</SidebarHeader>
 			<SidebarContent>
-				<NavMain items={data.navMain} />
-				<NavResources projects={data.projects} />
+				<NavTools projects={data.projects} />
+				<NavResources items={data.navMain} />
 			</SidebarContent>
 			<SidebarFooter>
-				<NavUser user={data.user} />
+				<NavUser waffle={waffle} />
 			</SidebarFooter>
 			<SidebarRail />
 		</Sidebar>
