@@ -1,13 +1,8 @@
 "use client";
 
 import {
-	BadgeCheck,
-	Bell,
 	ChevronsUpDown,
-	CreditCard,
 	FileSliders,
-	LogOut,
-	Sparkles,
 	Unlink,
 } from "lucide-react";
 
@@ -29,15 +24,8 @@ import {
 } from "@/components/ui/sidebar";
 import { useRobotStore } from "@/store/robot-store";
 import Link from "next/link";
-import { useState } from "react";
 
-export function NavUser({
-	waffle,
-}: {
-	waffle: {
-		number: number;
-	};
-}) {
+export function NavUser() {
 	const { isMobile } = useSidebar();
 	const robotNumber = useRobotStore((state) => state.robotNumber);
 

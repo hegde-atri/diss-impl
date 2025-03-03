@@ -108,7 +108,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				<NavResources items={data.navMain} />
 			</SidebarContent>
 			<SidebarFooter>
-				<NavUser waffle={waffle} />
+				<NavUser />
 			</SidebarFooter>
 			<SidebarRail />
 		</Sidebar>

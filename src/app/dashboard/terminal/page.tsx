@@ -4,6 +4,7 @@ import Code from "@/components/code";
 import InputRos2 from "@/components/input-ros2";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 import { ArrowRightIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -57,7 +58,7 @@ export default function TerminalPage() {
 						onClick={runCommand}
 					>
 						{isLoading ? (
-							"Running..."
+							<Spinner className="text-zinc-500" variant="ellipsis" />
 						) : (
 							<ArrowRightIcon size={16} aria-hidden="true" />
 						)}
