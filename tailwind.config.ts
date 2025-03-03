@@ -10,6 +10,9 @@ export default {
   ],
   theme: {
   	extend: {
+			fontFamily: {
+				
+			},
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',

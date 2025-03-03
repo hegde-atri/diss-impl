@@ -35,7 +35,7 @@ export function NavTools({
 	}[];
 }) {
 	return (
-		<SidebarGroup className="group-data-[collapsible=icon]:hidden">
+		<SidebarGroup className="">
 			<SidebarGroupLabel>Tools</SidebarGroupLabel>
 			<SidebarMenu>
 				{projects.map((item) => (

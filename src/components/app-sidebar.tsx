@@ -9,7 +9,7 @@ import {
 	Frame,
 	GalleryVerticalEnd,
 	Joystick,
-	Link,
+	Link as LinkIcon,
 	Map,
 	Network,
 	PieChart,
@@ -27,6 +27,7 @@ import {
 	SidebarHeader,
 	SidebarRail,
 } from "@/components/ui/sidebar";
+import Link from "next/link";
 
 // This is sample data.
 const data = {
@@ -71,7 +72,7 @@ const data = {
 		{
 			name: "Pairing",
 			url: "/dashboard/pairing",
-			icon: Link,
+			icon: LinkIcon,
 		},
 		{
 			name: "Teleoperation",
@@ -98,7 +99,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	return (
 		<Sidebar collapsible="icon" {...props}>
 			<SidebarHeader>
-				<h1>TB3 Dashboard</h1>
+				<Link href="/">
+				<h1 className="overflow-hidden whitespace-nowrap">TB3 Dashboard</h1>
+				</Link>
 			</SidebarHeader>
 			<SidebarContent>
 				<NavTools projects={data.projects} />

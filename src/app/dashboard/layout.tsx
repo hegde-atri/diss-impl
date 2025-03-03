@@ -27,6 +27,10 @@ export default function DashboardLayout({
     currentPage = "Pairing";
   } else if (path === "/dashboard/tele") {
     currentPage = "Teleoperation";
+  } else if (path === "/dashboard/topic") {
+    currentPage = "Topic Visualisation";
+  } else if (path === "/dashboard/terminal") {
+    currentPage = "Terminal";
   }
 
 	return (
@@ -46,7 +50,7 @@ export default function DashboardLayout({
             </Breadcrumb>
           </div>
         </header>
-        <div className="">
+        <div className="container mx-auto px-4 mt-4">
         {children}
         </div>
       </SidebarInset>
