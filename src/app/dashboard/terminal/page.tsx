@@ -38,7 +38,7 @@ export default function TerminalPage() {
 		}
 	};
 	return (
-		<div className="flex flex-col space-y-4">
+		<div className="flex flex-col space-y-4 h-[85vh] lg:h-auto">
 			<h1 className="text-xl">Terminal</h1>
 			<p>
 				You are able to run <Code>ros2</Code> commands using the input below.
@@ -67,7 +67,7 @@ export default function TerminalPage() {
 			</div>
 			<div
 				id="output"
-				className="min-w-[200px] min-h-[75vh] max-h-[75h] overflow-y-auto border rounded-md p-2"
+				className="min-w-[200px] h-full max-h-full lg:min-h-[75vh] lg:max-h-[75h] overflow-y-auto border rounded-md p-2"
 			>
 				{output === "" ? (
 					<div className="text-muted-foreground/80 p-2 italic ">No output</div>
