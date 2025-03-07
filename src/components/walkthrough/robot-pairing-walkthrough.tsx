@@ -1,6 +1,6 @@
-"use client"
+  "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import {
   Stepper,
   StepperItem,
@@ -21,15 +21,22 @@ export default function RobotPairingWalkthrough() {
   const setRobotNumber = useRobotStore((state) => state.setRobotNumber);
   const robotPaired = useRobotStore((state) => state.robotPaired);
   const setRobotPaired = useRobotStore((state) => state.setRobotPaired);
-  const [batteryLevel, setBatteryLevel] = useState(0)
+  const batteryLevel = useRobotStore((state) => state.batteryLevel);
+  const setBatteryLevel = useRobotStore((state) => state.setBatteryLevel);
+  const resetState = useRobotStore((state) => state.resetState);
   const [isLoading, setIsLoading] = useState(false)
-  const [pairingInProgress, setPairingInProgress] = useState(false)
+
+  // Set initial step based on pairing status when component mounts
+  useEffect(() => {
+    if (robotPaired) {
+      setActiveStep(2);
+    }
+  }, [robotPaired]);
 
   const handlePairRobot = async () => {
     if (!robotNumber) return
 
     setIsLoading(true)
-    setPairingInProgress(true)
 
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 2000))
@@ -45,18 +52,14 @@ export default function RobotPairingWalkthrough() {
       setRobotPaired(false)
     }
 
-    setPairingInProgress(false)
     setIsLoading(false)
     setActiveStep(2) // Move to result step
   }
 
   const resetWalkthrough = () => {
     setActiveStep(0)
-    setRobotNumber(0)
-    setRobotPaired(false)
-    setBatteryLevel(0)
+    resetState()
   }
-
   return (
     <div className="w-full">
       <Stepper value={activeStep} onValueChange={setActiveStep} className="mb-10 w-full">
