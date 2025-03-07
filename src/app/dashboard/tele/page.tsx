@@ -12,14 +12,16 @@ export default function TelePage() {
 		<section>
 			<h1 className="font-bold text-2xl mb-5">Command Centre</h1>
 			<div className="flex flex-col lg:grid lg:grid-cols-3 lg:grid-rows-4 lg:h-[85vh] lg:w-full gap-4">
-				<div className="col-span-2 row-span-3 bg-gray-300 rounded-md"></div>
+				{/* Camera Panel */}
+				<div className="col-span-2 row-span-3 bg-gray-300 rounded-md flex justify-center items-center">TODO: Camera Feed / Rviz Feed here</div>
+				{/* Teleoperation Panel */}
 				<div className="flex flex-col col-span-1 row-span-3 border rounded-md items-center">
 					<div className="flex flex-col w-full p-4 items-center h-full">
 						<h2 className="text-xl font-semibold mb-3">Teleoperation</h2>
-
 						<div className="flex flex-col w-full p-4 items-center justify-center h-full">
 							{/* TODO: Live data */}
-							<Card className="flex flex-col items-center w-[250px] mb-5  h-[100px]">
+							<Card className="flex flex-col items-center w-[250px] mb-5  h-[100px] justify-center">
+								TODO: Display Live Data
 							</Card>
 							{/* Control buttons */}
 							<div className="flex flex-col items-center w-full">
@@ -80,7 +82,8 @@ export default function TelePage() {
 						</div>
 					</div>
 				</div>
-				<div className="col-span-3 row-span-1 bg-gray-300 rounded-md"></div>
+				{/* Console log panel? */}
+				<div className="col-span-3 row-span-1 bg-gray-300 rounded-md flex justify-center items-center">TODO: Console log here</div>
 			</div>
 		</section>
 	);

@@ -1,28 +1,28 @@
 import { CommandOutput, CommandResponse } from "./types";
 
-export async function executeCommand(command: string): Promise<CommandOutput> {
-  const timestamp = new Date().toLocaleTimeString();
-  
+/**
+ * Function to execute a ROS2 command by sending a POST request to the API
+ * @param command - The command string to execute
+ * @returns Promise that resolves to the response data
+ */
+export async function executeCommand(command: string) {
   try {
-    const response = await fetch("/api/ros2", {
-      method: "POST",
+    const response = await fetch('/api/ros2', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({ command }),
     });
 
-    const data: CommandResponse = await response.json();
-
-    if (data.error) {
-      return { timestamp, content: data.error };
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to execute command');
     }
-    
-    return { timestamp, content: data.output || "" };
-  } catch (error: any) {
-    return { 
-      timestamp, 
-      content: `Error: ${error.message}` 
-    };
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error executing command:', error);
+    throw error;
   }
 }
