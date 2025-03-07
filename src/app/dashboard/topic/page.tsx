@@ -1,7 +1,9 @@
+import { TopicDashboard } from "@/components/topic/topic-dashboard";
+
 export default function TopicPage() {
   return (
     <div>
-      <div>Topic Page</div>
+      <TopicDashboard />
     </div>
   );
 }
