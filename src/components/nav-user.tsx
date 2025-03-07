@@ -1,10 +1,6 @@
 "use client";
 
-import {
-	ChevronsUpDown,
-	FileSliders,
-	Unlink,
-} from "lucide-react";
+import { ChevronsUpDown, FileSliders, Unlink } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -28,6 +24,7 @@ import Link from "next/link";
 export function NavUser() {
 	const { isMobile } = useSidebar();
 	const robotNumber = useRobotStore((state) => state.robotNumber);
+	const robotPaired = useRobotStore((state) => state.robotPaired);
 
 	return (
 		<SidebarMenu>
@@ -44,7 +41,7 @@ export function NavUser() {
 							</Avatar>
 							<div className="grid flex-1 text-left text-sm leading-tight">
 								<span className="truncate font-semibold">
-									Waffle Number: {robotNumber}
+									{robotPaired ? `Waffle Number: ${robotNumber}` : "Unpaired"}
 								</span>
 								<span className="truncate text-xs">TurtleBot3 Waffle</span>
 							</div>
@@ -65,7 +62,7 @@ export function NavUser() {
 								</Avatar>
 								<div className="grid flex-1 text-left text-sm leading-tight">
 									<span className="truncate font-semibold">
-										Waffle Number: {robotNumber}
+										{robotPaired ? `Waffle Number: ${robotNumber}` : "Unpaired"}
 									</span>
 									<span className="truncate text-xs">TurtleBot3 Waffle</span>
 								</div>

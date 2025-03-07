@@ -1,19 +1,18 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import type { PairingStatus } from "./robot-pairing-walkthrough"
 import { Battery, BatteryFull, BatteryLow, BatteryMedium, CheckCircle, RefreshCw, XCircle } from "lucide-react"
 import { Progress } from "@/components/ui/progress"
 
 interface ResultStepProps {
-  status: PairingStatus
+  status: boolean
   robotNumber: number | null
   batteryLevel: number
   onReset: () => void
 }
 
 export default function ResultStep({ status, robotNumber, batteryLevel, onReset }: ResultStepProps) {
-  if (status === "success") {
+  if (status === true) {
     return (
       <div className="flex flex-col items-center">
         <div className="bg-green-100 p-6 rounded-full mb-6">

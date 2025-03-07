@@ -15,22 +15,21 @@ import PairingStep from "./pairing-step"
 import ResultStep from "./results-step"
 import { useRobotStore } from '@/store/robot-store';
 
-export type PairingStatus = "idle" | "pairing" | "success" | "failed"
-
 export default function RobotPairingWalkthrough() {
   const [activeStep, setActiveStep] = useState(0)
   const robotNumber = useRobotStore((state) => state.robotNumber);
   const setRobotNumber = useRobotStore((state) => state.setRobotNumber);
-  const [pairingStatus, setPairingStatus] = useState<PairingStatus>("idle")
+  const robotPaired = useRobotStore((state) => state.robotPaired);
+  const setRobotPaired = useRobotStore((state) => state.setRobotPaired);
   const [batteryLevel, setBatteryLevel] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
+  const [pairingInProgress, setPairingInProgress] = useState(false)
 
   const handlePairRobot = async () => {
     if (!robotNumber) return
 
     setIsLoading(true)
-    setPairingStatus("pairing")
-
+    setPairingInProgress(true)
 
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 2000))
@@ -39,13 +38,14 @@ export default function RobotPairingWalkthrough() {
     const isSuccess = Math.random() < 0.8
 
     if (isSuccess) {
-      setPairingStatus("success")
+      setRobotPaired(true)
       // Generate random battery level between 10 and 100
       setBatteryLevel(Math.floor(Math.random() * 90) + 10)
     } else {
-      setPairingStatus("failed")
+      setRobotPaired(false)
     }
 
+    setPairingInProgress(false)
     setIsLoading(false)
     setActiveStep(2) // Move to result step
   }
@@ -53,7 +53,7 @@ export default function RobotPairingWalkthrough() {
   const resetWalkthrough = () => {
     setActiveStep(0)
     setRobotNumber(0)
-    setPairingStatus("idle")
+    setRobotPaired(false)
     setBatteryLevel(0)
   }
 
@@ -90,7 +90,7 @@ export default function RobotPairingWalkthrough() {
             <StepperIndicator />
             <div className="text-center">
               <StepperTitle>Result</StepperTitle>
-              <StepperDescription>{pairingStatus === "success" ? "Dashboard" : "Pairing status"}</StepperDescription>
+              <StepperDescription>{robotPaired ? "Dashboard" : "Pairing status"}</StepperDescription>
             </div>
           </StepperTrigger>
         </StepperItem>
@@ -110,7 +110,7 @@ export default function RobotPairingWalkthrough() {
 
         {activeStep === 2 && (
           <ResultStep
-            status={pairingStatus}
+            status={robotPaired}
             robotNumber={robotNumber}
             batteryLevel={batteryLevel}
             onReset={resetWalkthrough}
@@ -120,4 +120,3 @@ export default function RobotPairingWalkthrough() {
     </div>
   )
 }
-
