@@ -61,9 +61,9 @@ export default function ResultStep({ status, robotNumber, batteryLevel, onReset 
           </div>
         </div>
 
-        <Button variant="outline" onClick={onReset} className="gap-2">
+        <Button variant="destructive" onClick={onReset} className="gap-2">
           <RefreshCw className="h-4 w-4" />
-          Start New Pairing
+          Disconnect
         </Button>
       </div>
     )

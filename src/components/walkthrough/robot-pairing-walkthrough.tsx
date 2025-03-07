@@ -96,7 +96,7 @@ export default function RobotPairingWalkthrough() {
         </StepperItem>
       </Stepper>
 
-      <div className="mt-8 p-6 border rounded-lg">
+      <div className="mt-8 p-6 border rounded-md">
         {activeStep === 0 && <IntroductionStep onContinue={() => setActiveStep(1)} />}
 
         {activeStep === 1 && (
