@@ -65,9 +65,9 @@ export default function TerminalPage() {
 
 			return (
 				<div className="min-h-[10px]">
-					<span className="text-green-500">{prompt.split(" ")[0]}</span>
-					<span className="text-gray-300"> ros2 </span>
-					<span className="text-cyan-400">{command}</span>
+					<span className="text-green-600">{prompt.split(" ")[0]}</span>
+					<span className="text-gray-400"> ros2 </span>
+					<span className="text-cyan-600">{command}</span>
 				</div>
 			);
 		}
