@@ -80,7 +80,7 @@ const data = {
 			icon: Joystick,
 		},
 		{
-			name: "Topic Visualisation",
+			name: "Topic Explorer",
 			url: "/dashboard/topic",
 			icon: Network,
 		},

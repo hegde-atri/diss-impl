@@ -28,7 +28,7 @@ export default function DashboardLayout({
   } else if (path === "/dashboard/tele") {
     currentPage = "Teleoperation";
   } else if (path === "/dashboard/topic") {
-    currentPage = "Topic Visualisation";
+    currentPage = "Topic Explorer";
   } else if (path === "/dashboard/terminal") {
     currentPage = "Terminal";
   }
