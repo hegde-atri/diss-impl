@@ -34,17 +34,17 @@ const data = {
 	navMain: [
 		{
 			title: "Tutorials",
-			url: "/dashboard/tele",
+			url: "#",
 			icon: Map,
 			isActive: true,
 			items: [
 				{
 					title: "Topics",
-					url: "#",
+					url: "/dashboard/tutorials/topics",
 				},
 				{
 					title: "Teleoperation",
-					url: "#",
+					url: "/dashboard/tutorials/teleoperation",
 				},
 			],
 		},
@@ -52,18 +52,19 @@ const data = {
 			title: "Documentation",
 			url: "#",
 			icon: BookOpen,
+			isActive: true,
 			items: [
 				{
 					title: "Introduction",
-					url: "#",
+					url: "/dashboard/docs/introduction",
 				},
 				{
 					title: "Pairing",
-					url: "#",
+					url: "/dashboard/docs/pairing",
 				},
 				{
 					title: "Teleoperation",
-					url: "#",
+					url: "/dashboard/docs/teleoperation",
 				},
 			],
 		},
