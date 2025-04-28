@@ -7,7 +7,7 @@ import { toast, Toaster } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -60,17 +60,38 @@ export function TopicDashboard() {
         .trim()
         .split("\n")
         .filter((line: string) => line.trim() !== "")
-        .map((line: { split: (arg0: string) => [any, any] }) => {
-          const [name, type] = line.split(" : ");
+        .map((topic: string) => {
+          // With the -t flag, the format is "/topic_name [type_name]"
+          const parts = topic.match(/^(\/[^\s]+)\s+\[([^\]]+)\]$/);
+          
+          if (!parts) {
+            // Fallback in case the format doesn't match
+            const name = topic.trim();
+            return {
+              name: name,
+              type: "Unknown",
+              description: `ROS2 topic with unknown type`,
+              commands: {
+                view: `ros2 topic echo ${name}`,
+                publish: `ros2 topic pub ${name} std_msgs/String "{}"`,
+                info: `ros2 topic info ${name}`,
+                type: `ros2 interface show std_msgs/String`,
+              }
+            };
+          }
+          
+          const name = parts[1].trim();
+          const type = parts[2].trim();
+          
           return {
-            name: name.trim(),
-            type: type ? type.trim() : "Unknown",
-            description: `ROS2 topic of type ${type ? type.trim() : "Unknown"}`,
+            name: name,
+            type: type,
+            description: `ROS2 topic of type ${type}`,
             commands: {
-              view: `ros2 topic echo ${name.trim()}`,
-              publish: `ros2 topic pub ${name.trim()} ${type ? type.trim() : "Unknown"} '{}'`,
-              info: `ros2 topic info ${name.trim()}`,
-              type: `ros2 interface show ${type ? type.trim() : "Unknown"}`,
+              view: `ros2 topic echo ${name}`,
+              publish: `ros2 topic pub ${name} ${type} '{}'`,
+              info: `ros2 topic info ${name}`,
+              type: `ros2 interface show ${type}`,
             }
           };
         });
@@ -96,9 +117,14 @@ export function TopicDashboard() {
 
     try {
       setLoadingTopicData(true);
+      
+      // Debug log to verify the exact command being executed
+      console.log("Executing topic info command:", topic.commands.info);
+      
       const infoResponse = await executeCommand(topic.commands.info);
       
       if (infoResponse.error) {
+        console.error("Error response from topic info:", infoResponse.error);
         toast.error("Error fetching topic info", {
           description: infoResponse.error,
         });
@@ -150,6 +176,14 @@ export function TopicDashboard() {
       getTypeDetails(selectedTopic);
     }
   }, [selectedTopic]);
+
+  // Handle topic selection change
+  const handleTopicChange = (value: string) => {
+    const topic = topics.find(t => t.name === value);
+    if (topic) {
+      setSelectedTopic(topic);
+    }
+  };
 
   const copyToClipboard = async (text: string, commandType: string) => {
     try {
@@ -212,40 +246,21 @@ export function TopicDashboard() {
               {loading ? (
                 <Skeleton className="h-10 w-full" />
               ) : (
-                <Popover open={open} onOpenChange={setOpen}>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" role="combobox" aria-expanded={open} className="w-full justify-between">
-                      {selectedTopic ? selectedTopic.name : "Select a topic..."}
-                      <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[350px] p-0">
-                    <Command>
-                      <CommandInput placeholder="Search topics..." />
-                      <CommandList>
-                        <CommandEmpty>No topics found.</CommandEmpty>
-                        <CommandGroup>
-                          {topics.map((topic) => (
-                            <CommandItem
-                              key={topic.name}
-                              onSelect={() => {
-                                setSelectedTopic(topic)
-                                setOpen(false)
-                              }}
-                              className="flex justify-between"
-                            >
-                              <div className="flex items-center">
-                                <MessageSquare className="mr-2 h-4 w-4" />
-                                <span>{topic.name}</span>
-                              </div>
-                              <span className="text-xs text-muted-foreground">{topic.type}</span>
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
+                <Select onValueChange={handleTopicChange} defaultValue={selectedTopic?.name}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select a topic..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {topics.map((topic) => (
+                      <SelectItem key={topic.name} value={topic.name}>
+                        <div className="flex items-center justify-between w-full">
+                          <span>{topic.name}</span>
+                          <span className="text-xs text-muted-foreground ml-2">{topic.type}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               )}
             </CardContent>
           </Card>
