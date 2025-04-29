@@ -44,6 +44,20 @@ export default function PairingDocumentation() {
         </CardContent>
       </Card>
 
+      <Alert className="mb-6 bg-amber-50">
+        <AlertTitle>Required Robot Setup</AlertTitle>
+        <AlertDescription className="space-y-2">
+          <p>Before running the bridge, you <strong>must</strong> start the necessary ROS nodes on the robot by following these steps:</p>
+          <ol className="list-decimal pl-6 space-y-2">
+            <li>Enter a remote terminal session by running: <code>waffle NUM term</code> (replace NUM with your robot number)</li>
+            <li>Inside the terminal, run: <code>tb3_bringup</code> to start the required ROS nodes</li>
+            <li>Keep this terminal running while you return to your local machine</li>
+            <li>Now run <code>waffle NUM bridge</code> to establish the connection</li>
+          </ol>
+          <p className="italic mt-2">Failing to run tb3_bringup will result in missing topics and non-functional robot capabilities.</p>
+        </AlertDescription>
+      </Alert>
+
       <Alert className="mb-6">
         <AlertTitle>Important Note</AlertTitle>
         <AlertDescription>
@@ -58,6 +72,14 @@ export default function PairingDocumentation() {
         </CardHeader>
         <CardContent>
           <ol className="list-decimal pl-6 space-y-4">
+            <li>
+              <p className="font-semibold">Prepare the Robot</p>
+              <p>Use <code>waffle NUM term</code> to connect to the robot and run <code>tb3_bringup</code> to initialize the robot's ROS nodes.</p>
+            </li>
+            <li>
+              <p className="font-semibold">Establish the Bridge</p>
+              <p>Return to your local machine and run <code>waffle NUM bridge</code> to create a communication bridge with the robot.</p>
+            </li>
             <li>
               <p className="font-semibold">Navigate to the Pairing Page</p>
               <p>Access the pairing page from the sidebar or click <a href="/dashboard/pairing" className="text-blue-600 hover:underline">here</a>.</p>
@@ -85,6 +107,14 @@ export default function PairingDocumentation() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
+            <div>
+              <p className="font-semibold">Missing ROS Topics or Non-functional Robot</p>
+              <ul className="list-disc pl-6 space-y-1">
+                <li>Check if you ran <code>tb3_bringup</code> on the robot</li>
+                <li>Verify the terminal running <code>tb3_bringup</code> is still active and hasn't crashed</li>
+                <li>If issues persist, restart the process by running <code>tb3_bringup</code> again</li>
+              </ul>
+            </div>
             <div>
               <p className="font-semibold">Connection Refused</p>
               <ul className="list-disc pl-6 space-y-1">

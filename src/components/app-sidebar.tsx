@@ -15,6 +15,8 @@ import {
 	PieChart,
 	Settings2,
 	SquareTerminal,
+	Wifi,
+	WifiOff,
 } from "lucide-react";
 
 import { NavResources } from "@/components/nav-resources";
@@ -28,6 +30,10 @@ import {
 	SidebarRail,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
+import { useRobotStore } from "@/store/robot-store";
+import { useConnectionStatus } from "@/hooks/use-connection-status";
+import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 // This is sample data.
 const data = {
@@ -94,14 +100,48 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-	const waffle = {
-		number: 2,
-	};
+	const robotNumber = useRobotStore((state) => state.robotNumber);
+	const robotPaired = useRobotStore((state) => state.robotPaired);
+	
+	// Use the connection status hook to check every 5 seconds
+	const { isChecking, lastChecked } = useConnectionStatus(5000);
+
 	return (
 		<Sidebar collapsible="icon" {...props}>
 			<SidebarHeader>
 				<Link href="/">
-				<h1 className="overflow-hidden whitespace-nowrap">TB3 Dashboard</h1>
+					<div className="flex items-center justify-between w-full">
+						<h1 className="overflow-hidden whitespace-nowrap">TB3 Dashboard</h1>
+						
+						{robotNumber > 0 && (
+							<TooltipProvider>
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<div>
+											{robotPaired ? (
+												<Badge variant="outline" className="ml-2 bg-green-100 text-green-800 border-green-200 flex items-center gap-1">
+													<Wifi className="h-3 w-3" />
+													<span className="text-xs">TB3-{robotNumber}</span>
+												</Badge>
+											) : (
+												<Badge variant="outline" className="ml-2 bg-red-100 text-red-800 border-red-200 flex items-center gap-1">
+													<WifiOff className="h-3 w-3" />
+													<span className="text-xs">Disconnected</span>
+												</Badge>
+											)}
+										</div>
+									</TooltipTrigger>
+									<TooltipContent side="right">
+										{robotPaired 
+											? `Connected to TurtleBot3 #${robotNumber}` 
+											: `Not connected to TurtleBot3 #${robotNumber}`}
+										<br />
+										{lastChecked && <span className="text-xs text-muted-foreground">Last checked: {lastChecked.toLocaleTimeString()}</span>}
+									</TooltipContent>
+								</Tooltip>
+							</TooltipProvider>
+						)}
+					</div>
 				</Link>
 			</SidebarHeader>
 			<SidebarContent>

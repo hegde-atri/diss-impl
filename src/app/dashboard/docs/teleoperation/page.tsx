@@ -2,7 +2,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import Link from "next/link";
-import Image from "next/image";
 
 export default function TeleoperationDocumentation() {
   return (

@@ -3,9 +3,10 @@ import { CommandOutput, CommandResponse } from "./types";
 /**
  * Function to execute a ROS2 command by sending a POST request to the API
  * @param command - The command string to execute
+ * @param silent - If true, will return errors as part of response object rather than throwing
  * @returns Promise that resolves to the response data
  */
-export async function executeCommand(command: string) {
+export async function executeCommand(command: string, silent: boolean = false) {
   try {
     const response = await fetch('/api/ros2', {
       method: 'POST',
@@ -17,11 +18,27 @@ export async function executeCommand(command: string) {
 
     if (!response.ok) {
       const errorData = await response.json();
+      if (silent) {
+        // In silent mode, return error information rather than throwing
+        return {
+          error: true,
+          output: errorData.error || 'Failed to execute command',
+          exitCode: response.status
+        };
+      }
       throw new Error(errorData.error || 'Failed to execute command');
     }
 
     return await response.json();
   } catch (error) {
+    if (silent) {
+      // In silent mode, return error information rather than re-throwing
+      return {
+        error: true,
+        output: error instanceof Error ? error.message : 'Unknown error',
+        exitCode: 1
+      };
+    }
     console.error('Error executing command:', error);
     throw error;
   }

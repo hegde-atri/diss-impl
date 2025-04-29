@@ -19,12 +19,39 @@ import {
 	useSidebar,
 } from "@/components/ui/sidebar";
 import { useRobotStore } from "@/store/robot-store";
+import { executeCommand } from "@/lib/command";
 import Link from "next/link";
+import { useState } from "react";
 
 export function NavUser() {
 	const { isMobile } = useSidebar();
 	const robotNumber = useRobotStore((state) => state.robotNumber);
 	const robotPaired = useRobotStore((state) => state.robotPaired);
+	const setRobotPaired = useRobotStore((state) => state.setRobotPaired);
+	const [isUnpairing, setIsUnpairing] = useState(false);
+
+	const handleUnpair = async (e: React.MouseEvent) => {
+		e.preventDefault();
+		setIsUnpairing(true);
+		
+		try {
+			// Kill SSH connections
+			await executeCommand("pkill ssh");
+			
+			// Kill zenoh bridge processes
+			await executeCommand("pkill zenoh-bridge-ros2dds");
+			
+			// Update robot state to unpaired
+			setRobotPaired(false);
+			
+			// Now navigate to the pairing page
+			window.location.href = "/dashboard/pairing";
+		} catch (error) {
+			console.error("Error during unpairing:", error);
+		} finally {
+			setIsUnpairing(false);
+		}
+	};
 
 	return (
 		<SidebarMenu>
@@ -78,11 +105,13 @@ export function NavUser() {
 							</DropdownMenuItem>
 						</DropdownMenuGroup>
 						<DropdownMenuSeparator />
-						<DropdownMenuItem className="text-red-600" asChild>
-							<Link href="/dashboard/pairing">
-								<Unlink />
-								Unpair
-							</Link>
+						<DropdownMenuItem 
+							className="text-red-600" 
+							disabled={isUnpairing || !robotPaired}
+							onClick={handleUnpair}
+						>
+							<Unlink />
+							{isUnpairing ? "Unpairing..." : "Unpair"}
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>

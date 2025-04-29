@@ -45,11 +45,14 @@ export default function ResultStep({ status, robotNumber, batteryLevel, onReset 
     
     setIsCheckingConnection(true)
     try {
-      // Check if the zenoh bridge is running for this robot
-      const result = await executeCommand(`ps aux | grep "waffle ${robotNumber} bridge" | grep -v grep`);
+      // Check if the zenoh bridge is running for this robot - using silent mode
+      const result = await executeCommand(`ps aux | grep "waffle ${robotNumber} bridge" | grep -v grep`, true);
       
-      // If the command returns results, the bridge is running
-      const bridgeRunning = result && !result.error;
+      // If the command returns non-empty results, the bridge is running
+      const bridgeRunning = result && 
+                           !result.error && 
+                           typeof result.output === 'string' && 
+                           result.output.trim().length > 0;
       
       setIsConnected(bridgeRunning);
       setLastChecked(new Date());
@@ -72,8 +75,15 @@ export default function ResultStep({ status, robotNumber, batteryLevel, onReset 
 
   const handleDisconnect = async () => {
     try {
-      // Find the process ID of the bridge and kill it
+      // Kill all SSH connections
+      await executeCommand(`pkill ssh`);
+      
+      // Kill zenoh bridge processes
+      await executeCommand(`pkill zenoh-bridge-ros2dds`);
+      
+      // Also kill the specific robot bridge process
       await executeCommand(`pkill -f "waffle ${robotNumber} bridge"`);
+      
       setIsConnected(false);
       onReset();
     } catch (error) {
