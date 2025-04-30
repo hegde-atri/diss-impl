@@ -7,6 +7,7 @@ import { ArrowDown, ArrowUp, RotateCcw, RotateCw, Trash2 } from "lucide-react";
 import { executeCommand } from "@/lib/command";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useCommandHistoryStore } from "@/store/command-history";
+import ROS2Camera from "@/components/ros2-camera";
 
 export default function TelePage() {
   // Turtlebot3 max velocities (you might want to adjust these based on your model)
@@ -139,8 +140,11 @@ export default function TelePage() {
       <h1 className="font-bold text-2xl mb-3">Teleoperation</h1>
       <div className="flex flex-col lg:grid lg:grid-cols-3 lg:grid-rows-4 lg:h-[85vh] lg:w-full gap-4">
         {/* Camera Panel */}
-        <div className="col-span-2 row-span-3 bg-gray-300 rounded-md flex justify-center items-center">
-          TODO: Camera Feed / Rviz Feed here
+        <div className="col-span-2 row-span-3 rounded-md overflow-hidden">
+          <ROS2Camera 
+            height="100%" 
+            width="100%" 
+          />
         </div>
         {/* Teleoperation Panel */}
         <div className="flex flex-col col-span-1 row-span-3 border rounded-md items-center">

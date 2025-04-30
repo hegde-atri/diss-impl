@@ -28,6 +28,7 @@ import {
 	SidebarFooter,
 	SidebarHeader,
 	SidebarRail,
+	useSidebar,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 import { useRobotStore } from "@/store/robot-store";
@@ -105,6 +106,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	
 	// Use the connection status hook to check every 5 seconds
 	const { isChecking, lastChecked } = useConnectionStatus(5000);
+	
+	// Get the sidebar state to determine if it's collapsed
+	const { state, isMobile } = useSidebar();
+	const isExpanded = state === "expanded" || isMobile;
 
 	return (
 		<Sidebar collapsible="icon" {...props}>
@@ -113,7 +118,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 					<div className="flex items-center justify-between w-full">
 						<h1 className="overflow-hidden whitespace-nowrap">TB3 Dashboard</h1>
 						
-						{robotNumber > 0 && (
+						{robotNumber > 0 && isExpanded && (
 							<TooltipProvider>
 								<Tooltip>
 									<TooltipTrigger asChild>
