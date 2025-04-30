@@ -25,8 +25,6 @@ export default function RobotPairingWalkthrough() {
   const setRobotNumber = useRobotStore((state) => state.setRobotNumber);
   const robotPaired = useRobotStore((state) => state.robotPaired);
   const setRobotPaired = useRobotStore((state) => state.setRobotPaired);
-  const batteryLevel = useRobotStore((state) => state.batteryLevel);
-  const setBatteryLevel = useRobotStore((state) => state.setBatteryLevel);
   const resetState = useRobotStore((state) => state.resetState);
 
   // Set initial step based on pairing status when component mounts
@@ -50,12 +48,6 @@ export default function RobotPairingWalkthrough() {
       if (!result || result.error) {
         // Connection lost, but store thinks we're paired
         setRobotPaired(false);
-      } else {
-        // Connection is active, let's generate a synthetic battery level
-        // In a real app, we'd query this from a ROS2 topic
-        if (!batteryLevel || batteryLevel < 10) {
-          setBatteryLevel(Math.floor(Math.random() * 90) + 10);
-        }
       }
     } catch (error) {
       console.error("Error checking existing connection:", error);
@@ -73,17 +65,21 @@ export default function RobotPairingWalkthrough() {
       // 1. Run the pair command
       await executeCommand(`waffle ${robotNumber} pair`);
       
-      // In a real application, we'd handle the confirmation prompt, but for this demo:
+      // Wait a moment for the pairing to complete
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // 2. Run the bridge command
+      // 2. Run the bringup command
+      await executeCommand(`waffle ${robotNumber} bringup`);
+      
+      // Wait a moment for ROS2 to start on the robot
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // 3. Run the bridge command
       const bridgeResult = await executeCommand(`waffle ${robotNumber} bridge`);
       
-      // In a real app, this would check the result more carefully
+      // If the bridge started successfully
       if (!bridgeResult?.error) {
         setRobotPaired(true);
-        // Generate a random battery level (in a real app, this would come from a ROS2 topic)
-        setBatteryLevel(Math.floor(Math.random() * 60) + 40);
       } else {
         setRobotPaired(false);
         console.error("Failed to start bridge:", bridgeResult?.error);
@@ -157,7 +153,6 @@ export default function RobotPairingWalkthrough() {
           <ResultStep
             status={robotPaired}
             robotNumber={robotNumber}
-            batteryLevel={batteryLevel}
             onReset={resetWalkthrough}
           />
         )}

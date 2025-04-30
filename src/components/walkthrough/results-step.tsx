@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Battery, BatteryFull, BatteryLow, BatteryMedium, CheckCircle, RefreshCw, XCircle, Wifi, WifiOff } from "lucide-react"
-import { Progress } from "@/components/ui/progress"
+import { CheckCircle, RefreshCw, XCircle, Wifi, WifiOff } from "lucide-react"
 import { executeCommand } from "@/lib/command"
 import { Card } from "@/components/ui/card"
 import Link from "next/link"
@@ -11,14 +10,12 @@ import Link from "next/link"
 interface ResultStepProps {
   status: boolean
   robotNumber: number
-  batteryLevel: number
   onReset: () => void
 }
 
-export default function ResultStep({ status, robotNumber, batteryLevel, onReset }: ResultStepProps) {
+export default function ResultStep({ status, robotNumber, onReset }: ResultStepProps) {
   const [connectionChecks, setConnectionChecks] = useState(0)
   const [isConnected, setIsConnected] = useState(status)
-  const [batteryStatus, setBatteryStatus] = useState(batteryLevel)
   const [isCheckingConnection, setIsCheckingConnection] = useState(false)
   const [lastChecked, setLastChecked] = useState<Date>(new Date())
 
@@ -57,13 +54,6 @@ export default function ResultStep({ status, robotNumber, batteryLevel, onReset 
       setIsConnected(bridgeRunning);
       setLastChecked(new Date());
       
-      // Simulate getting battery updates (in a real implementation, this would come from a ROS2 topic)
-      if (bridgeRunning) {
-        // Simulate battery depletion (1-3% every few minutes)
-        const newBatteryLevel = Math.max(5, batteryStatus - Math.floor(Math.random() * 3));
-        setBatteryStatus(newBatteryLevel);
-      }
-      
       setConnectionChecks(prev => prev + 1);
     } catch (error) {
       console.error("Error checking connection:", error);
@@ -76,13 +66,13 @@ export default function ResultStep({ status, robotNumber, batteryLevel, onReset 
   const handleDisconnect = async () => {
     try {
       // Kill all SSH connections
-      await executeCommand(`pkill ssh`);
+      await executeCommand(`pkill ssh`, true);
       
       // Kill zenoh bridge processes
-      await executeCommand(`pkill zenoh-bridge-ros2dds`);
+      await executeCommand(`pkill zenoh`, true);
       
-      // Also kill the specific robot bridge process
-      await executeCommand(`pkill -f "waffle ${robotNumber} bridge"`);
+      // Also kill the waffle process
+      await executeCommand("pkill waffle", true);
       
       setIsConnected(false);
       onReset();
@@ -120,23 +110,6 @@ export default function ResultStep({ status, robotNumber, batteryLevel, onReset 
               <div className="flex justify-between items-center">
                 <span className="text-sm font-medium">Robot ID</span>
                 <span className="font-mono bg-gray-200 px-2 py-1 rounded text-sm">{robotNumber}</span>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-medium">Battery Level</span>
-                <span className="font-medium">{batteryStatus}%</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <Progress value={batteryStatus} className="flex-1" />
-                {batteryStatus > 70 ? (
-                  <BatteryFull className="h-5 w-5 text-green-500" />
-                ) : batteryStatus > 30 ? (
-                  <BatteryMedium className="h-5 w-5 text-amber-500" />
-                ) : (
-                  <BatteryLow className="h-5 w-5 text-red-500" />
-                )}
               </div>
             </div>
 

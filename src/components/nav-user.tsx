@@ -36,10 +36,12 @@ export function NavUser() {
 		
 		try {
 			// Kill SSH connections
-			await executeCommand("pkill ssh");
+			await executeCommand("pkill ssh", true);
 			
 			// Kill zenoh bridge processes
-			await executeCommand("pkill zenoh-bridge-ros2dds");
+			await executeCommand("pkill zenoh", true);
+
+			await executeCommand("pkill waffle", true);
 			
 			// Update robot state to unpaired
 			setRobotPaired(false);

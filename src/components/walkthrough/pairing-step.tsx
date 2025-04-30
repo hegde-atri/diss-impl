@@ -50,7 +50,7 @@ export default function PairingStep({ robotNumber, setRobotNumber, onPair, isLoa
     timeoutRef.current = setTimeout(() => {
       if (pairingStage < 3) { // If still in the pairing process (now checking for stage 3)
         setPairingStatus(prev => `${prev}\nError: Could not establish connection with the robot. The process timed out after 2 minutes.`)
-        setError("Failed to establish connection with the robot within 2 minutes. Please try again.")
+        setError("Failed to establish connection with the robot within 2 minutes. Please try again. (Have you turned the robot on?")
         setPairingStage(0)
       }
     }, 2 * 60 * 1000) // 2 minutes in milliseconds
@@ -103,9 +103,10 @@ export default function PairingStep({ robotNumber, setRobotNumber, onPair, isLoa
       
       // Kill any SSH connections that might have been established
       try {
-        await executeCommand("pkill ssh");
+        await executeCommand("pkill ssh", true);
         // Also kill any zenoh bridge processes
-        await executeCommand("pkill zenoh-bridge-ros2dds");
+        await executeCommand("pkill zenoh", true);
+			  await executeCommand("pkill waffle", true);
       } catch (terminationError) {
         console.error("Error terminating connections:", terminationError);
       }
