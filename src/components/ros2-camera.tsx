@@ -44,59 +44,34 @@ export default function ROS2Camera({
     window.open(snapshotUrl, '_blank');
   };
   
-  // Check if web_video_server is running
-  const checkServerStatus = async () => {
-    try {
-      const result = await executeCommand("ps aux | grep 'web_video_server' | grep -v grep", true);
-      const isRunning = result && 
-                      !result.error && 
-                      typeof result.output === 'string' && 
-                      result.output.trim().length > 0;
-      
-      setIsServerRunning(isRunning);
-      return isRunning;
-    } catch (error) {
-      console.error("Error checking web_video_server status:", error);
-      setIsServerRunning(false);
-      return false;
-    }
-  };
-
   // Start the web_video_server
   const startServer = async () => {
     try {
       setIsLoading(true);
-      const result = await executeCommand("ros2 run web_video_server web_video_server &");
+      // Update switch and server state immediately for better UI feedback
+      setIsStreamEnabled(true);
+      setIsServerRunning(true);
       
-      if (result.error) {
-        console.error("Failed to start web_video_server:", result.error);
-        toast.error("Failed to start video server", {
-          description: result.error
-        });
-        setIsServerRunning(false);
-        return false;
-      }
+      // Execute the command to start the web_video_server
+      await executeCommand("ros2 run web_video_server web_video_server &");
       
-      // Wait a moment for the server to start
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Simple wait for 1 second
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Check if it's actually running
-      const isRunning = await checkServerStatus();
+      toast.success("Video server started");
       
-      if (isRunning) {
-        toast.success("Video server started successfully");
-        setIsStreamEnabled(true);
-        // Refresh the stream immediately after server starts
-        setRefreshKey(prev => prev + 1);
-      }
-      
-      return isRunning;
+      // Show the iframe with a new key - use positive value to exit initialization state
+      setRefreshKey(Date.now());
+      setIsLoading(false); // Ensure loading state is cleared
+      return true;
     } catch (error) {
       console.error("Error starting web_video_server:", error);
       toast.error("Error starting video server");
+      setIsStreamEnabled(false);
+      setIsServerRunning(false);
       return false;
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Ensure loading state is cleared in all cases
     }
   };
 
@@ -104,20 +79,17 @@ export default function ROS2Camera({
   const stopServer = async () => {
     try {
       setIsLoading(true);
-      const result = await executeCommand("pkill -f web_video_server");
-      
-      // Check if it's actually stopped
-      await new Promise(resolve => setTimeout(resolve, 500));
-      const isRunning = await checkServerStatus();
-      
-      if (!isRunning) {
-        toast.success("Video server stopped successfully");
-      } else {
-        toast.error("Failed to stop video server");
-      }
-      
       setIsStreamEnabled(false);
-      return !isRunning;
+      setIsServerRunning(false);
+      
+      // Kill the web_video_server process
+      await executeCommand("pkill -f web_video_server", true);
+      
+      // Simple wait for 1 second
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast.success("Video server stopped");
+      return true;
     } catch (error) {
       console.error("Error stopping web_video_server:", error);
       toast.error("Error stopping video server");
@@ -127,44 +99,57 @@ export default function ROS2Camera({
     }
   };
 
-  // Toggle the server
+  // Toggle the server - simplified
   const toggleServer = async () => {
-    if (isServerRunning) {
-      await stopServer();
-    } else {
+    const targetState = !isServerRunning;
+    if (targetState) {
       await startServer();
+    } else {
+      await stopServer();
     }
   };
 
   // Refresh the stream
   const refreshStream = () => {
     setRefreshKey(prev => prev + 1);
+    setIsLoading(true); // Set loading state when refreshing
+    
+    // Clear loading state after a timeout even if iframe doesn't trigger events
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 3000);
   };
 
-  // Check server status when component mounts
+  // Check server status when component mounts - simplified
   useEffect(() => {
-    const initialize = async () => {
-      setIsLoading(true);
-      const serverRunning = await checkServerStatus();
-      setIsStreamEnabled(serverRunning);
-      if (serverRunning) {
-        // If server is already running, refresh the stream
-        setRefreshKey(prev => prev + 1);
-      }
-      setIsLoading(false);
-    };
-
     if (robotPaired) {
-      initialize();
+      setIsLoading(true);
+      
+      // Check if web_video_server is running
+      executeCommand("ps aux | grep 'web_video_server' | grep -v grep", true)
+        .then(result => {
+          const isRunning = result && 
+                          !result.error && 
+                          typeof result.output === 'string' && 
+                          result.output.trim().length > 0;
+          
+          setIsServerRunning(isRunning);
+          setIsStreamEnabled(isRunning);
+          
+          if (isRunning) {
+            setRefreshKey(Date.now());
+          }
+        })
+        .catch(error => {
+          console.error("Error checking server status:", error);
+          setIsServerRunning(false);
+          setIsStreamEnabled(false);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
     }
   }, [robotPaired]);
-
-  // Effect to auto-refresh stream when server becomes running
-  useEffect(() => {
-    if (isServerRunning && isStreamEnabled) {
-      setRefreshKey(prev => prev + 1);
-    }
-  }, [isServerRunning, isStreamEnabled]);
 
   // Handle image loading and error events
   const handleImageLoaded = () => {
@@ -178,6 +163,22 @@ export default function ROS2Camera({
     }
     setIsLoading(false);
   };
+
+  // Add safety timeout to clear loading state in case other handlers fail
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    
+    if (isLoading) {
+      // Clear loading state after 5 seconds as a safety measure
+      timeoutId = setTimeout(() => {
+        setIsLoading(false);
+      }, 5000);
+    }
+    
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [isLoading]);
 
   return (
     <Card 
@@ -243,26 +244,31 @@ export default function ROS2Camera({
           className="flex mx-auto w-full overflow-hidden "
           style={{ minHeight: '500px' }}
         >
-          {isLoading ? (
+          {isLoading && !isServerRunning ? (
             <div className="flex flex-col items-center justify-center w-full h-full">
               <Skeleton className="w-20 h-20 rounded-full" />
-              <p className="text-white text-center mt-2">Loading...</p>
+              <p className="text-center mt-2">Processing request...</p>
+            </div>
+          ) : isLoading && isServerRunning ? (
+            <div className="flex flex-col items-center justify-center w-full h-full">
+              <Skeleton className="w-20 h-20 rounded-full" />
+              <p className="text-center mt-2">Loading stream...</p>
             </div>
           ) : !robotPaired ? (
             <div className="flex items-center justify-center w-full h-full">
-              <p className="text-white text-center">Robot not connected. Please pair your robot first.</p>
+              <p className="text-center">Robot not connected. Please pair your robot first.</p>
             </div>
           ) : streamError ? (
             <div className="flex items-center justify-center w-full h-full">
-              <p className="text-white text-center">{streamError}</p>
+              <p className="text-center">{streamError}</p>
             </div>
           ) : !isServerRunning ? (
             <div className="flex items-center justify-center w-full h-full">
-              <p className="text-white text-center">Toggle the switch above to start the video server.</p>
+              <p className="text-center">Toggle the switch above to start the video server.</p>
             </div>
           ) : !isStreamEnabled ? (
             <div className="flex items-center justify-center w-full h-full">
-              <p className="text-white text-center">Stream is disabled. Toggle the switch to enable.</p>
+              <p className="text-center">Stream is disabled. Toggle the switch to enable.</p>
             </div>
           ) : (
             <iframe
