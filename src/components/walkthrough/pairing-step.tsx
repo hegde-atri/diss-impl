@@ -80,7 +80,7 @@ export default function PairingStep({ robotNumber, setRobotNumber, onPair, isLoa
       
       const command3 = `waffle ${robotNumber} bridge`;
       setPairingStatus(prev => `${prev}\n> ${command3}\nStarting bridge connection...`);
-      const bridgeResult = await executeCommand(command3);
+      await executeCommand(command3);
       setPairingStatus(prev => `${prev}\nBridge connection established successfully.`);
       
       // Wait a moment to simulate the bridge starting up

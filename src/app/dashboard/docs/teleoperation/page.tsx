@@ -58,7 +58,7 @@ export default function TeleoperationDocumentation() {
               <strong>Camera Feed:</strong> Real-time video from the robot's camera
             </li>
             <li>
-              <strong>Terminal Output:</strong> Displays the commands being executed and their output when any buttons are cliecked.
+              <strong>Terminal Output:</strong> Displays the commands being executed and their output when any buttons are clicked.
             </li>
           </ul>
           <div className="flex justify-center mb-4">

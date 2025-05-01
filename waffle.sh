@@ -193,7 +193,7 @@ waffle_ping() {
 bringup() {
     check-pairing loud
     echo -e "${CYAN}[$laptop_id]${NC} Opening terminal on dia-waffle$WAFFLE_NO and running tb3_bringup..."
-    ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/.ssh/waffle_rsa robot@dia-waffle$WAFFLE_NO -t "bash -l -c 'source /home/robot/.tuos/tuos_robot_setup.sh && tb3_bringup'"
+    ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/.ssh/waffle_rsa robot@dia-waffle$WAFFLE_NO -t "sleep 10 && bash -l -c 'source /home/robot/.tuos/tuos_robot_setup.sh && tb3_bringup'"
 }
 
 # Main:
