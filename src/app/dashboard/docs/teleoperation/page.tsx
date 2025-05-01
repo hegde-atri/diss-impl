@@ -52,16 +52,13 @@ export default function TeleoperationDocumentation() {
           </p>
           <ul className="list-disc pl-6 space-y-2 mb-4">
             <li>
-              <strong>Control Pad:</strong> An on-screen joystick for controlling robot movement
+              <strong>Teleoperation Buttons:</strong> 4 on-screen buttons and inputs to control the robot's movement
             </li>
             <li>
-              <strong>Camera Feed:</strong> Real-time video from the robot's camera (if equipped)
+              <strong>Camera Feed:</strong> Real-time video from the robot's camera
             </li>
             <li>
-              <strong>Speed Controls:</strong> Sliders or buttons to adjust the robot's movement speed
-            </li>
-            <li>
-              <strong>Status Indicators:</strong> Displays connection status and robot metrics
+              <strong>Terminal Output:</strong> Displays the commands being executed and their output when any buttons are cliecked.
             </li>
           </ul>
           <div className="flex justify-center mb-4">
@@ -81,9 +78,6 @@ export default function TeleoperationDocumentation() {
           <div className="space-y-6">
             <div>
               <h3 className="text-lg font-semibold mb-2">On-screen Controls</h3>
-              <p className="mb-2">
-                Use the virtual joystick by clicking/tapping and dragging in the direction you want the robot to move:
-              </p>
               <ul className="list-disc pl-6 space-y-1">
                 <li>Up: Move the robot forward</li>
                 <li>Down: Move the robot backward</li>

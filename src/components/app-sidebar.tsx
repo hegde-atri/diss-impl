@@ -36,7 +36,6 @@ import { useConnectionStatus } from "@/hooks/use-connection-status";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
-// This is sample data.
 const data = {
 	navMain: [
 		{

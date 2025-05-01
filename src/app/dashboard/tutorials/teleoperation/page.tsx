@@ -135,7 +135,7 @@ export default function TeleoperationTutorialPage() {
           <Alert className="mb-4">
             <AlertTitle>Safety Tip</AlertTitle>
             <AlertDescription>
-              Always start with low velocity values (e.g., 0.1 to 0.2 m/s linear, 0.5 to 1.0 rad/s angular)
+              Always start with low velocity values (e.g., 0.05 to 0.1 m/s linear, 0.3 to 0.7 rad/s angular)
               when first operating your robot to prevent accidents and damage.
             </AlertDescription>
           </Alert>
@@ -235,9 +235,10 @@ export default function TeleoperationTutorialPage() {
           
           <div className="mt-6">
             <p className="mb-2">
-              This entire process happens continuously, with the dashboard typically sending commands at a 
-              rate of 10-20 Hz (10-20 times per second) to ensure smooth robot movement. When you release 
-              controls, the dashboard automatically sends stop commands (all zeros) to halt the robot.
+              The dashboard translates each bottom to an equivalent ros2 command. For example, pressing the
+              "forward" button sends a command to the robot to move forward at a specified speed. The
+              dashboard continuously monitors the robot's state and updates the interface accordingly,
+              providing real-time feedback on the robot's position and orientation.
             </p>
             <p>
               By understanding this flow, you can better troubleshoot any teleoperation issues and gain 
