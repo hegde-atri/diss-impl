@@ -32,6 +32,46 @@ export default function TelePage() {
     }
   }, [history]);
 
+  // Add keyboard control
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Prevent default behavior for these keys (like scrolling with arrow keys)
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', ' '].includes(event.key.toLowerCase())) {
+        event.preventDefault();
+      }
+      
+      switch (event.key.toLowerCase()) {
+        case 'arrowup':
+        case 'w':
+          handleForward();
+          break;
+        case 'arrowdown':
+        case 's':
+          handleBackward();
+          break;
+        case 'arrowleft':
+        case 'a':
+          handleRotateLeft();
+          break;
+        case 'arrowright':
+        case 'd':
+          handleRotateRight();
+          break;
+        case ' ': // Spacebar
+          stopRobot();
+          break;
+      }
+    };
+
+    // Add event listener when component mounts
+    window.addEventListener('keydown', handleKeyDown);
+    
+    // Clean up event listener when component unmounts
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [linearVelocity, angularVelocity]); // Dependencies for the velocity control functions
+
   // Function to send velocity command
   const sendVelocityCommand = useCallback(
     async (linear: number, angular: number) => {
