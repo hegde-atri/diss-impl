@@ -12,7 +12,8 @@ export default function TelePage() {
   // Turtlebot3 max velocities (you might want to adjust these based on your model)
   const MAX_LINEAR_VELOCITY = 0.26; // m/s
   const MAX_ANGULAR_VELOCITY = 1.82; // rad/s
-  const VELOCITY_INCREMENT = 0.02;
+  const LINEAR_VELOCITY_INCREMENT = 0.02;
+  const ANGULAR_VELOCITY_INCREMENT = 0.2;
 
   const [linearVelocity, setLinearVelocity] = useState(0);
   const [angularVelocity, setAngularVelocity] = useState(0);
@@ -135,19 +136,19 @@ export default function TelePage() {
 
   // Handle button clicks
   const handleForward = () => {
-    sendVelocityCommand(linearVelocity + VELOCITY_INCREMENT, angularVelocity);
+    sendVelocityCommand(linearVelocity + LINEAR_VELOCITY_INCREMENT, angularVelocity);
   };
 
   const handleBackward = () => {
-    sendVelocityCommand(linearVelocity - VELOCITY_INCREMENT, angularVelocity);
+    sendVelocityCommand(linearVelocity - LINEAR_VELOCITY_INCREMENT, angularVelocity);
   };
 
   const handleRotateLeft = () => {
-    sendVelocityCommand(linearVelocity, angularVelocity + VELOCITY_INCREMENT);
+    sendVelocityCommand(linearVelocity, angularVelocity + ANGULAR_VELOCITY_INCREMENT);
   };
 
   const handleRotateRight = () => {
-    sendVelocityCommand(linearVelocity, angularVelocity - VELOCITY_INCREMENT);
+    sendVelocityCommand(linearVelocity, angularVelocity - ANGULAR_VELOCITY_INCREMENT);
   };
 
   // Handle custom velocity input
@@ -165,6 +166,13 @@ export default function TelePage() {
   const formatTimestamp = (timestamp: number) => {
     const date = new Date(timestamp);
     return date.toLocaleTimeString();
+  };
+
+  // Maintain chronological ordering for display
+  const getOrderedHistory = () => {
+    // Create a copy of the history array before reversing it
+    // This ensures newest commands (at the beginning) are displayed at the bottom
+    return [...history].reverse();
   };
 
   // Cleanup on unmount - make sure to stop the robot
@@ -307,7 +315,7 @@ export default function TelePage() {
               </p>
             ) : (
               <div className="space-y-3">
-                {history.map((entry, index) => (
+                {getOrderedHistory().map((entry, index) => (
                   <div key={index} className="border-b border-gray-800 pb-2">
                     <div className="flex items-center">
                       <span className="text-gray-500 mr-2">
