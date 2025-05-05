@@ -2,7 +2,8 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowDown, ArrowUp, RotateCcw, RotateCw, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, RotateCcw, RotateCw, Trash2, HelpCircle } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { executeCommand } from "@/lib/command";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useCommandHistoryStore } from "@/store/command-history";
@@ -154,11 +155,20 @@ export default function TelePage() {
   // Handle custom velocity input
   const handleSetCustomVelocity = () => {
     const newLinear = inputLinearVelocity
-      ? parseFloat(inputLinearVelocity)
+      ? Math.max(-MAX_LINEAR_VELOCITY, Math.min(MAX_LINEAR_VELOCITY, parseFloat(inputLinearVelocity)))
       : linearVelocity;
     const newAngular = inputAngularVelocity
-      ? parseFloat(inputAngularVelocity)
+      ? Math.max(-MAX_ANGULAR_VELOCITY, Math.min(MAX_ANGULAR_VELOCITY, parseFloat(inputAngularVelocity)))
       : angularVelocity;
+    
+    // Update the input fields to show the clamped values
+    if (inputLinearVelocity) {
+      setInputLinearVelocity(newLinear.toString());
+    }
+    if (inputAngularVelocity) {
+      setInputAngularVelocity(newAngular.toString());
+    }
+    
     sendVelocityCommand(newLinear, newAngular);
   };
 
@@ -196,7 +206,31 @@ export default function TelePage() {
         {/* Teleoperation Panel */}
         <div className="flex flex-col col-span-1 row-span-3 border rounded-md items-center">
           <div className="flex flex-col w-full p-4 items-center h-full">
-            <h2 className="text-xl font-semibold mb-3">Teleoperation</h2>
+            <div className="flex w-full justify-between items-center mb-3">
+              <h2 className="text-xl font-semibold">Teleoperation</h2>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-8 w-8 rounded-full"
+                    aria-label="Keyboard Controls Help"
+                  >
+                    <HelpCircle size={16} />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-64">
+                  <p className="font-medium mb-1">Keyboard Controls:</p>
+                  <div className="grid grid-cols-2 gap-1">
+                    <span><kbd className="px-1 bg-zinc-200 dark:bg-zinc-700 rounded">W</kbd> / <kbd className="px-1 bg-zinc-200 dark:bg-zinc-700 rounded">↑</kbd> Forward</span>
+                    <span><kbd className="px-1 bg-zinc-200 dark:bg-zinc-700 rounded">S</kbd> / <kbd className="px-1 bg-zinc-200 dark:bg-zinc-700 rounded">↓</kbd> Backward</span>
+                    <span><kbd className="px-1 bg-zinc-200 dark:bg-zinc-700 rounded">A</kbd> / <kbd className="px-1 bg-zinc-200 dark:bg-zinc-700 rounded">←</kbd> Left</span>
+                    <span><kbd className="px-1 bg-zinc-200 dark:bg-zinc-700 rounded">D</kbd> / <kbd className="px-1 bg-zinc-200 dark:bg-zinc-700 rounded">→</kbd> Right</span>
+                    <span className="col-span-2"><kbd className="px-1 bg-zinc-200 dark:bg-zinc-700 rounded">Space</kbd> Stop</span>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
             <div className="flex flex-col w-full text-sm items-center justify-center h-full">
               {/* Live data display */}
               <div className="text-center">
