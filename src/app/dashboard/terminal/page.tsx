@@ -1,11 +1,11 @@
 "use client";
 
+import React, { useEffect, useRef, useState } from "react";
 import Code from "@/components/code";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { executeCommand } from "@/lib/command";
 import { ArrowRightIcon, InfoIcon } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function TerminalPage() {
@@ -42,7 +42,12 @@ export default function TerminalPage() {
 	const runCommand = async () => {
 		if (!command.trim()) return;
 
-		const commandToExecute = command; // Store the current command
+		// Remove leading "ros2" if it exists
+		let commandToExecute = command.trim();
+		if (commandToExecute.toLowerCase().startsWith("ros2 ")) {
+			commandToExecute = commandToExecute.substring(5).trim();
+		}
+
 		setIsLoading(true);
 		
 		// Set timeout for 10 seconds
@@ -192,7 +197,11 @@ export default function TerminalPage() {
 				{output === "" ? (
 					<div className="text-muted-foreground/80 p-2 italic ">No output</div>
 				) : (
-					output.split("\n").map((line, index) => renderLine(line))
+					output.split("\n").map((line, index) => (
+						<React.Fragment key={`line-${index}`}>
+							{renderLine(line)}
+						</React.Fragment>
+					))
 				)}
 				<div ref={outputEndRef} />
 			</div>
