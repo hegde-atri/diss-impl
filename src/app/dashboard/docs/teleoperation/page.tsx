@@ -62,10 +62,7 @@ export default function TeleoperationDocumentation() {
             </li>
           </ul>
           <div className="flex justify-center mb-4">
-            {/* Replace with an actual screenshot when available */}
-            <div className="bg-gray-200 h-64 w-full flex items-center justify-center rounded-md">
-              [Teleoperation Interface Screenshot]
-            </div>
+            <img src="/images/teleop.png" alt="Teleoperation screen" className="shadow-2xl rounded-2xl border-2" />
           </div>
         </CardContent>
       </Card>
