@@ -4,49 +4,111 @@ import Code from "@/components/code";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { executeCommand } from "@/lib/command";
-import { ArrowRightIcon } from "lucide-react";
+import { ArrowRightIcon, InfoIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function TerminalPage() {
 	const [output, setOutput] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const [command, setCommand] = useState("");
 	const outputEndRef = useRef<HTMLDivElement>(null);
+	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
 	useEffect(() => {
 		outputEndRef.current?.scrollIntoView({ behavior: "smooth" });
 	}, [output]);
 
+	// Clean up timeout on unmount
+	useEffect(() => {
+		return () => {
+			if (timeoutRef.current) {
+				clearTimeout(timeoutRef.current);
+			}
+		};
+	}, []);
+
+	// Check if command needs --once suggestion
+	const needsOnceHint = (cmd: string): boolean => {
+		// List of commands that should use --once
+		const commandsThatNeedOnce = ["topic echo", "topic list", "node list", "service list"];
+		
+		// Don't show hint if --once is already in the command
+		if (cmd.includes("--once")) return false;
+		
+		return commandsThatNeedOnce.some(needsOnceCmd => cmd.trim().startsWith(needsOnceCmd));
+	};
+
 	const runCommand = async () => {
 		if (!command.trim()) return;
 
+		const commandToExecute = command; // Store the current command
 		setIsLoading(true);
+		
+		// Set timeout for 10 seconds
+		timeoutRef.current = setTimeout(() => {
+			// Don't need to check isLoading here - if this timeout runs, we need to reset
+			setOutput(
+				(prev) =>
+					prev +
+					"\n" +
+					formatCommandLine(commandToExecute) +
+					"\n" +
+					"Command is taking too long to complete. It may be running continuously. " +
+					"Consider using --once flag for commands like 'topic echo'."
+			);
+			setIsLoading(false);
+			setCommand("");
+			
+			// Make sure to nullify timeout reference
+			timeoutRef.current = null;
+		}, 10000);
+
 		try {
-			const data = await executeCommand(command);
+			const fullCommand = `ros2 ${commandToExecute}`;
+			const data = await executeCommand(fullCommand);
+
+			// Clear timeout since we got a response
+			if (timeoutRef.current) {
+				clearTimeout(timeoutRef.current);
+				timeoutRef.current = null;
+			}
 
 			if (data.error && data.error.trim()) {
 				setOutput(
-					(prev) => prev + "\n" + formatCommandLine(command) + "\n" + data.error
+					(prev) => prev + "\n" + formatCommandLine(commandToExecute) + "\n" + data.error
 				);
 			} else {
 				setOutput(
 					(prev) =>
-						prev + "\n" + formatCommandLine(command) + "\n" + data.output
+						prev + "\n" + formatCommandLine(commandToExecute) + "\n" + data.output
 				);
 			}
 			setCommand(""); // Clear the input after execution
 		} catch (error: any) {
+			// Clear timeout since we got a response
+			if (timeoutRef.current) {
+				clearTimeout(timeoutRef.current);
+				timeoutRef.current = null;
+			}
+
 			setOutput(
 				(prev) =>
 					prev +
 					"\n\n" +
-					formatCommandLine(command) +
+					formatCommandLine(commandToExecute) +
 					"\n" +
 					"Error: " +
-					error.message
+					(error instanceof Error ? error.message : String(error))
 			);
 		} finally {
-			setIsLoading(false);
+			// Only set isLoading to false if timeout hasn't already done it
+			// Check if the current timeout ref is null - if it is, the timeout already fired
+			if (timeoutRef.current) {
+				clearTimeout(timeoutRef.current);
+				timeoutRef.current = null;
+				setIsLoading(false);
+			}
 		}
 	};
 
@@ -88,12 +150,12 @@ export default function TerminalPage() {
 				Press enter or the send arrow when you want to send a command.
 			</p>
 			<div className="flex w-full">
-				<div className="relative">
+				<div className="relative w-full">
 					<span className="text-muted-foreground pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 text-sm peer-disabled:opacity-50">
 						ros2
 					</span>
 					<Input
-						className="peer ps-12 pe-9"
+						className="peer ps-12 pe-9 w-full"
 						placeholder="command"
 						onKeyDown={handleKeyDown}
 						disabled={isLoading}
@@ -115,6 +177,14 @@ export default function TerminalPage() {
 					</button>
 				</div>
 			</div>
+			{needsOnceHint(command) && (
+				<Alert variant="default" className="bg-blue-50 border-blue-200">
+					<InfoIcon className="h-4 w-4 text-blue-500" />
+					<AlertDescription>
+						Tip: Add <Code>--once</Code> to this command to prevent it from running continuously.
+					</AlertDescription>
+				</Alert>
+			)}
 			<div
 				id="output"
 				className="min-w-[200px] font-mono h-full max-h-full lg:min-h-[75vh] lg:max-h-[75h] overflow-y-auto border rounded-md p-2"

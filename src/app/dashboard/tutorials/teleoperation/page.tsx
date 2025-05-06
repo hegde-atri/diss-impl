@@ -7,10 +7,6 @@ export default function TeleoperationTutorialPage() {
   return (
     <div className="container mx-auto py-6">
       <Breadcrumb className="mb-6">
-        <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-foreground">
-          Dashboard
-        </Link>
-        <span className="text-sm text-muted-foreground mx-2">/</span>
         <Link href="#" className="text-sm text-muted-foreground hover:text-foreground">
           Tutorials
         </Link>
