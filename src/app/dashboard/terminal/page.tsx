@@ -107,13 +107,13 @@ export default function TerminalPage() {
 					(error instanceof Error ? error.message : String(error))
 			);
 		} finally {
-			// Only set isLoading to false if timeout hasn't already done it
-			// Check if the current timeout ref is null - if it is, the timeout already fired
+			 // Clear any remaining timeout
 			if (timeoutRef.current) {
 				clearTimeout(timeoutRef.current);
 				timeoutRef.current = null;
-				setIsLoading(false);
 			}
+			// Always reset loading state regardless of timeout status
+			setIsLoading(false);
 		}
 	};
 
