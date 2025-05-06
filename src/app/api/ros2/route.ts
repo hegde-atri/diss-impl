@@ -11,7 +11,7 @@ export async function POST(request: Request) {
       )
     }
 
-    return new Promise((resolve) => {
+    return new Promise<Response>((resolve) => {
       exec(body.command, (error, stdout, stderr) => {
         if (error) {
           resolve(NextResponse.json({ error: error.message }, { status: 500 }));
@@ -30,5 +30,4 @@ export async function POST(request: Request) {
       { status: 400 }
     )
   }
-
 }

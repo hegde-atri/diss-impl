@@ -31,6 +31,8 @@ Usage: waffle [NUM] [COMMAND]
           (dia-waffle[NUM])
   ping    Look for the specified robot (dia-waffle[NUM]) on the network by
           ${IT}ping${NC}ing it.
+  pingpong Check if the robot (dia-waffle[NUM]) is reachable and return ${IT}true${NC} or
+          ${IT}false${NC}.
   off     Shutdown the robot.
   bringup Launch a terminal in the robot and run the ${IT}tb3_bringup${NC} command.
 "
@@ -46,7 +48,7 @@ ask() {
         return 1;
     elif [ "$reply" == "y" ] || [ "$reply" == "Y" ]; then
         return 0;
-    else
+    elspairinge
         return 1;
     fi
 }
@@ -96,6 +98,18 @@ launch-zenoh() {
     echo "Establishing a Zenoh bridge with dia-waffle$WAFFLE_NO"
     sleep 3
     zenoh-bridge-ros2dds -e tcp/dia-waffle$WAFFLE_NO:7447
+}
+
+pingpong() {
+    echo -e "${CYAN}[$laptop_id]${NC} Checking if ${GREEN}dia-waffle$WAFFLE_NO${NC} is reachable..."
+    # Try pinging the robot once with a 2 second timeout
+    if ping -c 1 -W 2 dia-waffle$WAFFLE_NO &>/dev/null; then
+        echo "true"
+        return 0
+    else
+        echo "false"
+        return 1
+    fi
 }
 
 # CLI entry points:
@@ -240,6 +254,9 @@ case $COMMAND in
         ;;
     ping)
         waffle_ping
+        ;;
+    pingpong)
+        pingpong
         ;;
     *) 
         echo -e "${RED}[INVALID INPUT]...${NC}"

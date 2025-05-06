@@ -21,27 +21,38 @@ export function useConnectionStatus(checkIntervalMs = 5000) {
     
     setIsChecking(true);
     try {
-      // Using a silent version of execute command to avoid error popups
-      // when the process is not running (which is an expected case)
-      const result = await executeCommand(`ps aux | grep "waffle ${robotNumber} bridge" | grep -v grep`, true);
+      // Check if the bridge is running
+      const bridgeResult = await executeCommand(`ps aux | grep "waffle ${robotNumber} bridge" | grep -v grep`, true);
       
       // If the command returns non-empty results, the bridge is running
-      // Empty result or error result means the process is not running
-      const bridgeRunning = result && 
-                           !result.error && 
-                           typeof result.output === 'string' && 
-                           result.output.trim().length > 0;
+      const bridgeRunning = bridgeResult && 
+                           !bridgeResult.error && 
+                           typeof bridgeResult.output === 'string' && 
+                           bridgeResult.output.trim().length > 0;
+      
+      // Check if the robot can be pinged using the pingpong command
+      const pingResult = await executeCommand(`waffle ${robotNumber} pingpong`, true);
+      
+      // pingpong returns "true" or "false" string in the output
+      const isPingable = pingResult && 
+                        !pingResult.error && 
+                        typeof pingResult.output === 'string' && 
+                        pingResult.output.includes('true');
+      
+      // Consider the robot connected if both bridge is running AND robot is pingable
+      const isConnected = bridgeRunning && isPingable;
       
       // Update the robot paired status in the store if it's different
-      if (robotPaired !== bridgeRunning) {
-        console.log(`Connection status changed: ${bridgeRunning ? 'Connected' : 'Disconnected'}`);
-        setRobotPaired(bridgeRunning);
+      if (robotPaired !== isConnected) {
+        console.log(`Connection status changed: ${isConnected ? 'Connected' : 'Disconnected'}`);
+        console.log(`Bridge running: ${bridgeRunning}, Pingable: ${isPingable}`);
+        setRobotPaired(isConnected);
       }
       
       setLastChecked(new Date());
     } catch (error) {
       // This will likely not execute since we're using silent mode
-      console.log("Robot disconnected or process not running");
+      console.log("Error checking robot connection status:", error);
       
       // If there's an error checking the status, assume disconnected
       if (robotPaired) {
