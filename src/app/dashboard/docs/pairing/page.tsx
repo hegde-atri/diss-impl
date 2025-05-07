@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default function PairingDocumentation() {
   return (
@@ -15,6 +16,7 @@ export default function PairingDocumentation() {
       </Breadcrumb>
 
       <h1 className="text-3xl font-bold mb-6">Pairing with TurtleBot3</h1>
+      <Button className="mb-4" asChild><Link href="/dashboard/pairing">Visit Page</Link></Button>
       
       <Card className="mb-6">
         <CardHeader>

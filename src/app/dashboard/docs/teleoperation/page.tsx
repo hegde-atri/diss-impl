@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default function TeleoperationDocumentation() {
   return (
@@ -15,6 +16,7 @@ export default function TeleoperationDocumentation() {
       </Breadcrumb>
 
       <h1 className="text-3xl font-bold mb-6">TurtleBot3 Teleoperation</h1>
+      <Button className="mb-4" asChild><Link href="/dashboard/tele">Visit Page</Link></Button>
       
       <Card className="mb-6">
         <CardHeader>

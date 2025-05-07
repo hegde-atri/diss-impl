@@ -23,7 +23,7 @@ export default function TeleoperationTutorialPage() {
         </CardHeader>
         <CardContent>
           <p className="mb-4">
-            Teleoperation (or "telop" for short) is the practice of controlling a robot from a distance.
+            Teleoperation (or "teleop" for short) is the practice of controlling a robot from a distance.
             In ROS2, teleoperation is typically achieved by publishing velocity commands to the robot's
             command velocity topic.
           </p>
