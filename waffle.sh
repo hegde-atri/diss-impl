@@ -48,7 +48,7 @@ ask() {
         return 1;
     elif [ "$reply" == "y" ] || [ "$reply" == "Y" ]; then
         return 0;
-    elspairinge
+    else
         return 1;
     fi
 }
@@ -206,8 +206,19 @@ waffle_ping() {
 
 bringup() {
     check-pairing loud
-    echo -e "${CYAN}[$laptop_id]${NC} Opening terminal on dia-waffle$WAFFLE_NO and running tb3_bringup..."
-    ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/.ssh/waffle_rsa robot@dia-waffle$WAFFLE_NO -t "sleep 10 && bash -l -c 'source /home/robot/.tuos/tuos_robot_setup.sh && tb3_bringup'"
+    echo -e "${CYAN}[$laptop_id]${NC} Checking if bringup is already running on dia-waffle$WAFFLE_NO..."
+    
+    # Check if tb3_bringup is already running on the robot
+    # First grep for tb3_bringup, then exclude the grep command itself
+    bringup_running=$(ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/.ssh/waffle_rsa robot@dia-waffle$WAFFLE_NO "ps aux | grep 'tb3_bringup' | grep -v grep || echo ''")
+    
+    if [[ -n "$bringup_running" ]]; then
+        echo -e "${GREEN}[dia-waffle$WAFFLE_NO]${NC} tb3_bringup is already running."
+        echo -e "${GREEN}[Process info]${NC} $bringup_running"
+    else
+        echo -e "${CYAN}[$laptop_id]${NC} No existing bringup process found. Starting tb3_bringup..."
+        ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/.ssh/waffle_rsa robot@dia-waffle$WAFFLE_NO -t "bash -l -c 'source /home/robot/.tuos/tuos_robot_setup.sh && tb3_bringup'"
+    fi
 }
 
 # Main:
