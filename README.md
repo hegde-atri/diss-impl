@@ -2,20 +2,107 @@
 
 Done as part of my dissertation work at the University of Sheffield 2024-2025.
 
-## Requirements
+## Architecture Diagram
 
-| No. | Requirements                                                                       | Time | Difficulty | MoSCoW      |
-| --- | ---------------------------------------------------------------------------------- | ---- | ---------- | ----------- |
-| 1.1 | Automated pairing process                                                          | 13   | 8          | Must Have   |
-| 1.2 | Onboarding process walking the user through the pairing process                    | 21   | 5          | Must Have   |
-| 1.3 | Human Readable error should be shown if a command fails during the pairing process | 13   | 13         | Must Have   |
-| 1.4 | Onboarding should allow to go back steps and change chosen options                 | 8    | 5          | Could Have  |
-| 2.1 | Basic teleoperation capabilites                                                    | 5    | 8          | Must Have   |
-| 2.2 | It must display live velocity data                                                 | 5    | 8          | Must Have   |
-| 2.3 | It must also display odometry data                                                 | 5    | 8          | Should Have |
-| 3.1 | It must list all the topics in a drop down                                         | 5    | 2          | Must Have   |
-| 3.2 | It should have a refresh button to update list of topics                           | 3    | 2          | Should Have |
-| 3.3 | It must have a card to display details of the selected topic                       | 3    | 2          | Must Have   |
-| 3.4 | It should have an option to switch between topics, services and actions            | 8    | 5          | Must Have   |
-| 3.4 | The ability to invoke services and actions, with user fillable parameters          | 13   | 21         | Could Have  |
-| 4.1 | The ability to have a side panel that you can toggle that has Rviz                 | 21   | 21         | Could Have  |
+```mermaid
+graph TD
+    %% Client-Side Components
+    subgraph "Client Side"
+        UI[Browser UI]
+        ReactComponents[React Components]
+        NextJS[Next.js Client Components]
+        Hooks[Custom Hooks]
+        
+        %% State Management
+        subgraph "State Management (Zustand)"
+            ZustandStores[Zustand Stores]
+            LocalStorage[(Local Storage)]
+            CommandHistoryStore[Command History Store]
+            RobotStore[Robot Store]
+        end
+        
+        %% Client-side Logic
+        ClientLogic[Client-side Logic]
+        FetchAPI[Fetch API]
+    end
+    
+    %% Server-Side Components
+    subgraph "Server Side"
+        NextJSServer[Next.js Server]
+        
+        subgraph "API Routes"
+            ROS2API["/api/ros2"]
+        end
+        
+        subgraph "Shell Execution"
+            ChildProcess[Child Process]
+            ShellExec[Shell Command Execution]
+        end
+        
+        subgraph "Robot Communication"
+            ZenohBridge[Zenoh Bridge]
+        end
+    end
+    
+    %% External Systems
+    subgraph "TurtleBot3 Waffle"
+        TurtleBot3[TurtleBot3 Robot]
+        ROS2[ROS2 System]
+    end
+    
+    %% Connections and Data Flow
+    
+    %% Client-side connections
+    UI --> ReactComponents
+    ReactComponents --> NextJS
+    ReactComponents --> Hooks
+    Hooks --> ZustandStores
+    Hooks --> FetchAPI
+    
+    %% State Management connections
+    ZustandStores <--> LocalStorage
+    ZustandStores --> CommandHistoryStore
+    ZustandStores --> RobotStore
+    CommandHistoryStore <--> LocalStorage
+    RobotStore <--> LocalStorage
+    
+    %% API connections
+    FetchAPI --> ROS2API
+    
+    %% Server-side connections
+    ROS2API --> ChildProcess
+    ChildProcess --> ShellExec
+    ShellExec --> ZenohBridge
+    
+    %% External connections
+    ZenohBridge <--> ROS2
+    ROS2 <--> TurtleBot3
+    
+    %% Additional connections
+    ClientLogic --> FetchAPI
+    NextJS --> NextJSServer
+    
+    %% Connection Status Flow
+    Hooks -- "Check Connection Status" --> ROS2API
+    ROS2API -- "Response" --> Hooks
+    Hooks -- "Update Status" --> RobotStore
+    
+    %% Command Execution Flow
+    ReactComponents -- "Execute Command" --> FetchAPI
+    FetchAPI -- "POST Request" --> ROS2API
+    ROS2API -- "Execute" --> ShellExec
+    ShellExec -- "Response" --> ROS2API
+    ROS2API -- "JSON Response" --> FetchAPI
+    FetchAPI -- "Command Result" --> ReactComponents
+    ReactComponents -- "Store History" --> CommandHistoryStore
+
+    classDef clientSide fill:#f9f7ed,stroke:#333,stroke-width:1px;
+    classDef serverSide fill:#e6f3ff,stroke:#333,stroke-width:1px;
+    classDef storage fill:#fff2cc,stroke:#333,stroke-width:1px;
+    classDef external fill:#e1d5e7,stroke:#333,stroke-width:1px;
+
+    class UI,ReactComponents,NextJS,Hooks,ZustandStores,ClientLogic,FetchAPI,CommandHistoryStore,RobotStore clientSide;
+    class NextJSServer,ROS2API,ChildProcess,ShellExec,WaffleScript,ZenohBridge serverSide;
+    class LocalStorage storage;
+    class TurtleBot3,ROS2 external;
+```
