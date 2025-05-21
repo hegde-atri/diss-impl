@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'TurtleBot3 Dashboard',
+  title: 'TurtleBot3 Tools',
   description: '...',
   icons: {
     icon: '/icon-192x192.png',
