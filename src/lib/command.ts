@@ -1,11 +1,3 @@
-import { CommandOutput, CommandResponse } from "./types";
-
-/**
- * Function to execute a ROS2 command by sending a POST request to the API
- * @param command - The command string to execute
- * @param silent - If true, will return errors as part of response object rather than throwing
- * @returns Promise that resolves to the response data
- */
 export async function executeCommand(command: string, silent: boolean = false) {
   try {
     const response = await fetch('/api/ros2', {
@@ -23,7 +15,7 @@ export async function executeCommand(command: string, silent: boolean = false) {
         return {
           error: true,
           output: errorData.error || 'Failed to execute command',
-          exitCode: response.status
+          exitCode: response.status,
         };
       }
       throw new Error(errorData.error || 'Failed to execute command');
@@ -36,7 +28,7 @@ export async function executeCommand(command: string, silent: boolean = false) {
       return {
         error: true,
         output: error instanceof Error ? error.message : 'Unknown error',
-        exitCode: 1
+        exitCode: 1,
       };
     }
     console.error('Error executing command:', error);

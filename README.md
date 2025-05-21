@@ -12,7 +12,7 @@ graph TD
         ReactComponents[React Components]
         NextJS[Next.js Client Components]
         Hooks[Custom Hooks]
-        
+
         %% State Management
         subgraph "State Management (Zustand)"
             ZustandStores[Zustand Stores]
@@ -20,73 +20,73 @@ graph TD
             CommandHistoryStore[Command History Store]
             RobotStore[Robot Store]
         end
-        
+
         %% Client-side Logic
         ClientLogic[Client-side Logic]
         FetchAPI[Fetch API]
     end
-    
+
     %% Server-Side Components
     subgraph "Server Side"
         NextJSServer[Next.js Server]
-        
+
         subgraph "API Routes"
             ROS2API["/api/ros2"]
         end
-        
+
         subgraph "Shell Execution"
             ChildProcess[Child Process]
             ShellExec[Shell Command Execution]
         end
-        
+
         subgraph "Robot Communication"
             ZenohBridge[Zenoh Bridge]
         end
     end
-    
+
     %% External Systems
     subgraph "TurtleBot3 Waffle"
         TurtleBot3[TurtleBot3 Robot]
         ROS2[ROS2 System]
     end
-    
+
     %% Connections and Data Flow
-    
+
     %% Client-side connections
     UI --> ReactComponents
     ReactComponents --> NextJS
     ReactComponents --> Hooks
     Hooks --> ZustandStores
     Hooks --> FetchAPI
-    
+
     %% State Management connections
     ZustandStores <--> LocalStorage
     ZustandStores --> CommandHistoryStore
     ZustandStores --> RobotStore
     CommandHistoryStore <--> LocalStorage
     RobotStore <--> LocalStorage
-    
+
     %% API connections
     FetchAPI --> ROS2API
-    
+
     %% Server-side connections
     ROS2API --> ChildProcess
     ChildProcess --> ShellExec
     ShellExec --> ZenohBridge
-    
+
     %% External connections
     ZenohBridge <--> ROS2
     ROS2 <--> TurtleBot3
-    
+
     %% Additional connections
     ClientLogic --> FetchAPI
     NextJS --> NextJSServer
-    
+
     %% Connection Status Flow
     Hooks -- "Check Connection Status" --> ROS2API
     ROS2API -- "Response" --> Hooks
     Hooks -- "Update Status" --> RobotStore
-    
+
     %% Command Execution Flow
     ReactComponents -- "Execute Command" --> FetchAPI
     FetchAPI -- "POST Request" --> ROS2API

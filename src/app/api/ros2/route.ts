@@ -8,7 +8,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: 'Invalid input: command string is required' },
         { status: 400 }
-      )
+      );
     }
 
     return new Promise<Response>((resolve) => {
@@ -17,17 +17,19 @@ export async function POST(request: Request) {
           resolve(NextResponse.json({ error: error.message }, { status: 500 }));
           return;
         }
-        
-        resolve(NextResponse.json({ 
-          output: stdout,
-          error: stderr 
-        }));
+
+        resolve(
+          NextResponse.json({
+            output: stdout,
+            error: stderr,
+          })
+        );
       });
     });
   } catch (error) {
     return NextResponse.json(
       { error: 'Invalid request body' },
       { status: 400 }
-    )
+    );
   }
 }

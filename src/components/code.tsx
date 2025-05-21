@@ -1,3 +1,7 @@
 export default function Code({ children }: { children: React.ReactNode }) {
-	return <span className="bg-zinc-200 font-mono rounded-sm px-1 py-0.5">{children}</span>;
+  return (
+    <span className='rounded-sm bg-zinc-200 px-1 py-0.5 font-mono'>
+      {children}
+    </span>
+  );
 }
